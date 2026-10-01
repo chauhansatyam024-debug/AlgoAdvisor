@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "graphiti-memory": {
+      "uri": "http://localhost:8000/mcp",
+      "transport": {
+        "type": "http"
+      }
+    }
+  }
+}

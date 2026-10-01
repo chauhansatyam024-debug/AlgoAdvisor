@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f9f4">
+    <title>AlgoAdvisor | Analysis results</title>
+    <link rel="stylesheet" href="{% static 'advisor/app.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="{% url 'index' %}" aria-label="AlgoAdvisor home"><span class="brand-mark" aria-hidden="true">A.</span><span>AlgoAdvisor</span></a>
+        <span class="header-note"><span class="status-dot" aria-hidden="true"></span> ANALYSIS REPORT</span>
+    </header>
+    <main class="page-shell results-shell">
+        <a class="back-link" href="{% url 'index' %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg>New analysis</a>
+        <div class="result-heading"><div><p class="eyebrow">Your dataset, evaluated</p><h1>Analysis results</h1></div><span class="result-tag">3-fold cross-validation</span></div>
+    {% if error %}
+        <div class="error-panel" role="alert"><strong>We couldn't analyze this dataset.</strong>{{ error }}</div>
+    {% endif %}
+    {% if result %}
+        <div class="result-grid">
+            <section class="panel recommendation" aria-labelledby="recommendation-title">
+                <p class="eyebrow">Top-performing model</p>
+                <h2 id="recommendation-title">{{ result.best_algorithm }}</h2>
+                <p>Highest mean accuracy across the evaluated validation folds.</p>
+            </section>
+            <section class="panel scores-panel" aria-labelledby="scores-title">
+                <h2 class="panel-title" id="scores-title">Model comparison</h2>
+                <div class="score-list">
+                {% for name, score in result.base_scores.items %}
+                    <div class="score-row{% if name == result.best_algorithm %} is-best{% endif %}">
+                        <div class="score-topline"><span class="score-name">{{ name }}</span><span class="score-value">{{ score|floatformat:3 }}</span></div>
+                        <div class="score-track" role="img" aria-label="{{ name }} accuracy {{ score|floatformat:3 }}"><div class="score-fill" style="width: {% widthratio score 1 100 %}%"></div></div>
+                    </div>
+                {% endfor %}
+                </div>
+            </section>
+            <section class="panel features-panel" aria-labelledby="features-title">
+                <h2 class="panel-title" id="features-title">Dataset profile</h2>
+                <dl class="feature-list">
+                {% for name, value in result.meta_features.items %}
+                    <div class="feature-item"><dt>{{ name }}</dt><dd>{{ value }}</dd></div>
+                {% endfor %}
+                </dl>
+            </section>
+        </div>
+    {% elif not error %}
+        <p class="empty-state">No dataset has been analyzed yet. <a href="{% url 'index' %}">Upload a CSV to begin.</a></p>
+    {% endif %}
+    </main>
+</body>
+</html>
